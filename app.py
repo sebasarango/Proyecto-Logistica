@@ -1,6 +1,7 @@
-# app.py
+# 📌 Paso 1: Instalar librerías necesarias
+!pip install pdfplumber
 
-import streamlit as st
+# 📌 Paso 2: Importar librerías
 import requests
 from bs4 import BeautifulSoup
 from zipfile import ZipFile
@@ -8,11 +9,12 @@ import io
 import pdfplumber
 import pandas as pd
 from datetime import datetime
+import streamlit as st
 
-# 📌 URL base
+# 📌 Paso 3: URL base
 URL = "https://www.dane.gov.co/index.php/estadisticas-por-tema/agropecuario/sistema-de-informacion-de-precios-sipsa/componente-precios-mayoristas"
 
-# 📌 Extraer enlaces
+# 📌 Paso 4: Extraer los enlaces más recientes
 def extraer_ultimos_enlaces_sipsa(url):
     resp = requests.get(url)
     soup = BeautifulSoup(resp.content, 'html.parser')
@@ -32,29 +34,14 @@ def extraer_ultimos_enlaces_sipsa(url):
 
     return enlace_excel, enlace_zip
 
-# 📌 Descargar y preprocesar Excel de Bogotá
-def obtener_dataframe_bogota(url_excel):
+# 📌 Paso 5: Descargar Excel como DataFrame
+def obtener_dataframe_excel(url_excel):
     resp = requests.get(url_excel)
-    df_sipsa = pd.read_excel(io.BytesIO(resp.content), header=None)
+    df = pd.read_excel(io.BytesIO(resp.content))
+    print("✅ Excel cargado como DataFrame.")
+    return df
 
-    # Tu preprocesamiento
-    columnas_combinadas = df_sipsa.iloc[1].fillna(method='ffill') + " - " + df_sipsa.iloc[2].fillna('')
-    df_sipsa.columns = ['Producto'] + list(columnas_combinadas[1:])
-    df_sipsa_limpio = df_sipsa.iloc[4:].copy()
-
-    columnas_bogota = [col for col in df_sipsa_limpio.columns if col.startswith('Bogotá, Corabastos')]
-    if not columnas_bogota:
-        return pd.DataFrame({"Error": ["No se encontraron columnas de Bogotá."]})
-
-    df_bogota = df_sipsa_limpio[['Producto'] + columnas_bogota].copy()
-    df_bogota.columns = ['Producto', 'Precio ($/kg)', 'Variación %']
-    df_bogota['Precio ($/kg)'] = pd.to_numeric(df_bogota['Precio ($/kg)'], errors='coerce')
-    df_bogota['Variación %'] = pd.to_numeric(df_bogota['Variación %'], errors='coerce')
-    df_bogota = df_bogota[df_bogota['Precio ($/kg)'].notna()].reset_index(drop=True).astype({'Precio ($/kg)': 'int64'})
-
-    return df_bogota
-
-# 📌 Leer PDF Bogotá
+# 📌 Paso 6: Leer PDF de Bogotá como texto
 def obtener_texto_pdf_bogota(url_zip):
     resp = requests.get(url_zip)
     zipfile_bytes = io.BytesIO(resp.content)
@@ -67,23 +54,49 @@ def obtener_texto_pdf_bogota(url_zip):
                         texto = "\n".join(
                             page.extract_text() for page in pdf.pages if page.extract_text()
                         )
+                        print("✅ Texto del PDF de Bogotá extraído.")
                         return texto
-    return "No se encontró PDF de Bogotá."
+    return None
 
-# 📌 Ejecutar scraping y procesar
+# 📌 Paso 7: Ejecutar el proceso completo
 def obtener_datos_sipsa():
     enlace_excel, enlace_zip = extraer_ultimos_enlaces_sipsa(URL)
 
+    # Convertir a enlaces absolutos si es necesario
     if enlace_excel and enlace_excel.startswith('/'):
         enlace_excel = f"https://www.dane.gov.co{enlace_excel}"
     if enlace_zip and enlace_zip.startswith('/'):
         enlace_zip = f"https://www.dane.gov.co{enlace_zip}"
 
-    df_bogota = obtener_dataframe_bogota(enlace_excel) if enlace_excel else None
-    texto_bogota = obtener_texto_pdf_bogota(enlace_zip) if enlace_zip else "No se encontró el PDF de Bogotá."
+    df_excel = obtener_dataframe_excel(enlace_excel) if enlace_excel else None
+    texto_bogota = obtener_texto_pdf_bogota(enlace_zip) if enlace_zip else None
 
-    return df_bogota, texto_bogota
+    return df_excel, texto_bogota
 
+# Ejecutar y obtener los datos
+df_sipsa, texto_bogota = obtener_datos_sipsa()
+# Paso 1: Crear nombres de columnas combinando fila 1 y 2
+columnas_combinadas = df_sipsa.iloc[1].fillna(method='ffill') + " - " + df_sipsa.iloc[2].fillna('')
+df_sipsa.columns = ['Producto'] + list(columnas_combinadas[1:])  # Renombra columnas
+
+# Paso 2: Eliminar filas de encabezado y categorías
+df_sipsa_limpio = df_sipsa.iloc[4:].copy()  # A partir de fila 5 (índice 4)
+
+# Paso 3: Filtrar columnas de Bogotá
+columnas_bogota = [col for col in df_sipsa_limpio.columns if col.startswith('Bogotá, Corabastos')]
+df_bogota = df_sipsa_limpio[['Producto'] + columnas_bogota].copy()
+
+# Paso 4: Renombrar columnas
+df_bogota.columns = ['Producto', 'Precio ($/kg)', 'Variación %']
+
+# Paso 5: Convertir a numérico donde sea posible y limpiar valores
+df_bogota['Precio ($/kg)'] = pd.to_numeric(df_bogota['Precio ($/kg)'], errors='coerce')
+df_bogota['Variación %'] = pd.to_numeric(df_bogota['Variación %'], errors='coerce')
+
+# Opcional: eliminar filas vacías o sin precio
+df_bogota = df_bogota[df_bogota['Precio ($/kg)'].notna()].reset_index(drop=True).astype({'Precio ($/kg)': 'int64'})
+
+# Mostrar resultado
 # === INTERFAZ STREAMLIT ===
 st.set_page_config(page_title="Precios SIPSA - Bogotá", layout="centered")
 st.title("📊 Precios Mayoristas - Bogotá (SIPSA)")
@@ -102,4 +115,4 @@ if st.button("🔄 Obtener precios"):
         st.subheader("📝 Extracto del PDF de Bogotá")
         st.text_area("Contenido del informe PDF", texto_pdf[:2000], height=300)
     else:
-        st.error("❌ No se pudieron cargar los datos de Bogotá.")
+        st.error("❌ No se pudieron cargar los datos de Bogotá.")'''
