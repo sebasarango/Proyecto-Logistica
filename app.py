@@ -73,37 +73,37 @@ def obtener_datos_sipsa():
 
     return df_excel, texto_bogota
 
-# Ejecutar y obtener los datos
-df_sipsa, texto_bogota = obtener_datos_sipsa()
+def procesar_bogota(df):
 # Paso 1: Crear nombres de columnas combinando fila 1 y 2
-columnas_combinadas = df_sipsa.iloc[1].fillna(method='ffill') + " - " + df_sipsa.iloc[2].fillna('')
-df_sipsa.columns = ['Producto'] + list(columnas_combinadas[1:])  # Renombra columnas
+  columnas_combinadas = df_sipsa.iloc[1].fillna(method='ffill') + " - " + df_sipsa.iloc[2].fillna('')
+  df_sipsa.columns = ['Producto'] + list(columnas_combinadas[1:])  # Renombra columnas
 
-# Paso 2: Eliminar filas de encabezado y categorías
-df_sipsa_limpio = df_sipsa.iloc[4:].copy()  # A partir de fila 5 (índice 4)
+  # Paso 2: Eliminar filas de encabezado y categorías
+  df_sipsa_limpio = df_sipsa.iloc[4:].copy()  # A partir de fila 5 (índice 4)
 
-# Paso 3: Filtrar columnas de Bogotá
-columnas_bogota = [col for col in df_sipsa_limpio.columns if col.startswith('Bogotá, Corabastos')]
-df_bogota = df_sipsa_limpio[['Producto'] + columnas_bogota].copy()
+  # Paso 3: Filtrar columnas de Bogotá
+  columnas_bogota = [col for col in df_sipsa_limpio.columns if col.startswith('Bogotá, Corabastos')]
+  df_bogota = df_sipsa_limpio[['Producto'] + columnas_bogota].copy()
 
-# Paso 4: Renombrar columnas
-df_bogota.columns = ['Producto', 'Precio ($/kg)', 'Variación %']
+  # Paso 4: Renombrar columnas
+  df_bogota.columns = ['Producto', 'Precio ($/kg)', 'Variación %']
 
-# Paso 5: Convertir a numérico donde sea posible y limpiar valores
-df_bogota['Precio ($/kg)'] = pd.to_numeric(df_bogota['Precio ($/kg)'], errors='coerce')
-df_bogota['Variación %'] = pd.to_numeric(df_bogota['Variación %'], errors='coerce')
+  # Paso 5: Convertir a numérico donde sea posible y limpiar valores
+  df_bogota['Precio ($/kg)'] = pd.to_numeric(df_bogota['Precio ($/kg)'], errors='coerce')
+  df_bogota['Variación %'] = pd.to_numeric(df_bogota['Variación %'], errors='coerce')
 
-# Opcional: eliminar filas vacías o sin precio
-df_bogota = df_bogota[df_bogota['Precio ($/kg)'].notna()].reset_index(drop=True).astype({'Precio ($/kg)': 'int64'})
+  # Opcional: eliminar filas vacías o sin precio
+  df_bogota = df_bogota[df_bogota['Precio ($/kg)'].notna()].reset_index(drop=True).astype({'Precio ($/kg)': 'int64'})
+  return df_bogota
 
-# Mostrar resultado
 # === INTERFAZ STREAMLIT ===
 st.set_page_config(page_title="Precios SIPSA - Bogotá", layout="centered")
 st.title("📊 Precios Mayoristas - Bogotá (SIPSA)")
 st.caption("Consulta los precios publicados por el DANE desde el archivo 'Anexo'")
 
 if st.button("🔄 Obtener precios"):
-    df, texto_pdf = obtener_datos_sipsa()
+    df_1, texto_pdf = obtener_datos_sipsa()
+    df = obtener_texto_pdf_bogota(df_1)
 
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
