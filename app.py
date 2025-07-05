@@ -103,7 +103,7 @@ st.caption("Consulta los precios publicados por el DANE desde el archivo 'Anexo'
 
 if st.button("🔄 Obtener precios"):
     df_1, texto_pdf = obtener_datos_sipsa()
-    df = obtener_texto_pdf_bogota(df_1)
+    df = procesar_bogota(df_1)
 
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
