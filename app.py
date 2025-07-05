@@ -75,11 +75,11 @@ def obtener_datos_sipsa():
 
 def procesar_bogota(df):
 # Paso 1: Crear nombres de columnas combinando fila 1 y 2
-  columnas_combinadas = df_sipsa.iloc[1].fillna(method='ffill') + " - " + df_sipsa.iloc[2].fillna('')
-  df_sipsa.columns = ['Producto'] + list(columnas_combinadas[1:])  # Renombra columnas
+  columnas_combinadas = df.iloc[1].fillna(method='ffill') + " - " + df.iloc[2].fillna('')
+  df.columns = ['Producto'] + list(columnas_combinadas[1:])  # Renombra columnas
 
   # Paso 2: Eliminar filas de encabezado y categorías
-  df_sipsa_limpio = df_sipsa.iloc[4:].copy()  # A partir de fila 5 (índice 4)
+  df_sipsa_limpio = df.iloc[4:].copy()  # A partir de fila 5 (índice 4)
 
   # Paso 3: Filtrar columnas de Bogotá
   columnas_bogota = [col for col in df_sipsa_limpio.columns if col.startswith('Bogotá, Corabastos')]
