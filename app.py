@@ -115,4 +115,4 @@ if st.button("🔄 Obtener precios"):
         st.subheader("📝 Extracto del PDF de Bogotá")
         st.text_area("Contenido del informe PDF", texto_pdf[:2000], height=300)
     else:
-        st.error("❌ No se pudieron cargar los datos de Bogotá.")'''
+        st.error("❌ No se pudieron cargar los datos de Bogotá.")
