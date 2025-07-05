@@ -103,6 +103,7 @@ st.caption("Consulta los precios publicados por el DANE desde el archivo 'Anexo'
 if st.button("🔄 Obtener precios"):
     df_1 = obtener_datos_sipsa()
     df = procesar_bogota(df_1)
+    fecha = df_1.iloc[0,0].astype(str)
 
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
@@ -112,7 +113,7 @@ if st.button("🔄 Obtener precios"):
         st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
 
         st.subheader("📝 Extracto del PDF de Bogotá")
-        st.text_area("La fecha de estos datos es", value=df_1.iloc[0,0], height=300)
+        st.text_area("La fecha de estos datos es", value=fecha, height=300)
     else:
         st.error("❌ No se pudieron cargar los datos de Bogotá.")
 
