@@ -69,9 +69,8 @@ def obtener_datos_sipsa():
         enlace_zip = f"https://www.dane.gov.co{enlace_zip}"
 
     df_excel = obtener_dataframe_excel(enlace_excel) if enlace_excel else None
-    texto_bogota = obtener_texto_pdf_bogota(enlace_zip) if enlace_zip else None
 
-    return df_excel, texto_bogota
+    return df_excel
 
 def procesar_bogota(df):
 # Paso 1: Crear nombres de columnas combinando fila 1 y 2
@@ -113,6 +112,7 @@ if st.button("🔄 Obtener precios"):
         st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
 
         st.subheader("📝 Extracto del PDF de Bogotá")
-        st.text_area("Contenido del informe PDF", texto_pdf[:2000], height=300)
+        st.text_area("La fecha de estos datos es", datetime.today().strftime("%Y-%m-%d"), value=texto_pdf, height=300)
     else:
         st.error("❌ No se pudieron cargar los datos de Bogotá.")
+
