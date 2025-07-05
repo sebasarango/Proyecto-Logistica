@@ -112,7 +112,7 @@ if st.button("🔄 Obtener precios"):
         st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
 
         st.subheader("📝 Extracto del PDF de Bogotá")
-        st.text_area("La fecha de estos datos es", datetime.today().strftime("%Y-%m-%d"), value=texto_pdf, height=300)
+        st.text_area("La fecha de estos datos es", value=df_1.iloc[0,0], height=300)
     else:
         st.error("❌ No se pudieron cargar los datos de Bogotá.")
 
