@@ -1,5 +1,5 @@
 # 📌 Paso 1: Instalar librerías necesarias
-!pip install pdfplumber
+#!pip install pdfplumber
 
 # 📌 Paso 2: Importar librerías
 import requests
