@@ -97,7 +97,7 @@ def procesar_bogota(df):
 
 # === INTERFAZ STREAMLIT ===
 st.set_page_config(page_title="Precios SIPSA - Bogotá", layout="centered")
-st.title("📊 Precios Mayoristas - Bogotá (SIPSA)")
+st.title("📊 Precios Mayoristas - Bogotá")
 st.caption("Consulta los precios publicados por el DANE desde el archivo 'Anexo'")
 
 if st.button("🔄 Obtener precios"):
