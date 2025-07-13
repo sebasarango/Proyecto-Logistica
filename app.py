@@ -126,25 +126,52 @@ st.caption("Consulta los precios publicados por el DANE desde el archivo 'Anexo'
 df_1 = obtener_datos_sipsa()
 df, df_bajaron = procesar_bogota(df_1)
 fecha = str(df_1.iloc[0,0])
+
 if st.button("Tabla fija"):
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
-        st.dataframe(df)
 
+        # Preparar tabla: index desde 1
+        df.index = df.index + 1
+        mitad = len(df) // 2
+        df_izq = df.iloc[:mitad]
+        df_der = df.iloc[mitad:]
+
+        # Función para estilo uniforme
+        def estilizar_tabla(subdf):
+            return (
+                subdf.style
+                .format({"Variación %": "{:.2f}"})
+                .set_properties(
+                    subset=["Precio ($/kg)", "Variación %"],
+                    **{"text-align": "center"}
+                )
+                .to_html(index=False, escape=False)
+            )
+
+        html_izq = estilizar_tabla(df_izq)
+        html_der = estilizar_tabla(df_der)
+
+        # Renderizar dos columnas HTML con flexbox
+        st.markdown(
+            f"""
+            <div style="display: flex; justify-content: center; gap: 40px;">
+                <div style="flex: 1;">{html_izq}</div>
+                <div style="flex: 1;">{html_der}</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # Botón para descargar CSV completo
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
 
         st.subheader("📝 Extracto del PDF de Bogotá")
         st.markdown(f"📅 **La fecha de estos datos es:** {fecha}")
     else:
-        st.error("❌ No se pudieron cargar los datos de Bogotá.")
-
-    # Mostrar productos que bajaron de precio
-    mostrar_top_variacion(df_bajaron, tipo="bajada")
-    # Mostrar productos que subieron de precio
-    mostrar_top_variacion(df_bajaron, tipo="subida") 
+        st.error("❌ No se pudieron cargar los datos de Bogotá.") 
         
-
 if st.button("Tabla interactiva"):
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
