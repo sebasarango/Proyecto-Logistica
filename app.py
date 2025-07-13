@@ -102,8 +102,8 @@ st.title("📊 Precios Mayoristas - Bogotá (SIPSA)")
 st.caption("Consulta los precios publicados por el DANE desde el archivo 'Anexo'")
 
 if st.button("🔄 Obtener precios"):
-    df_1,df_bajaron = obtener_datos_sipsa()
-    df = procesar_bogota(df_1)
+    df_1 = obtener_datos_sipsa()
+    df, df_bajaron = procesar_bogota(df_1)
     fecha = str(df_1.iloc[0,0])
 
     if df is not None and "Error" not in df.columns:
