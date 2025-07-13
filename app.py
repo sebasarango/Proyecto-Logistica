@@ -97,42 +97,42 @@ def procesar_bogota(df):
   df_productos_bajaron = df_bogota.sort_values(by='Variación %').reset_index(drop=True)
   return df_bogota, df_productos_bajaron
 
+def mostrar_top_variacion(df_bajaron, tipo="bajada"):
+    if tipo == "bajada":
+        top = df_bajaron.head(3).reset_index(drop=True)
+        titulo = "📉 Productos que más han bajado de precio"
+        vacio = "No hay productos que hayan bajado de precio en este día."
+        signo = ""
+    else:
+        top = df_bajaron.tail(3)[::-1].reset_index(drop=True)  # Orden descendente
+        titulo = "📈 Productos que más han subido de precio"
+        vacio = "No hay productos que hayan subido de precio en este día."
+        signo = "+"
+
+    if not top.empty:
+        st.subheader(titulo)
+        for i, row in top.iterrows():
+            st.markdown(
+                f"{i+1}. **{row['Producto']}**: {signo}{row['Variación %']:.2f}%, "
+                f"precio: {row['Precio ($/kg)']}"
+            )
+    else:
+        st.info(vacio)
+        
 # === INTERFAZ STREAMLIT ===
 st.set_page_config(page_title="Precios SIPSA - Bogotá", layout="centered")
 st.title("📊 Precios Mayoristas - Bogotá")
 st.caption("Consulta los precios publicados por el DANE desde el archivo 'Anexo'")
 
-if st.button("Tabla fija"):
+if st.button("🔄 Obtener precios"):
     df_1 = obtener_datos_sipsa()
     df, df_bajaron = procesar_bogota(df_1)
-    fecha = str(df_1.iloc[0, 0])
+    fecha = str(df_1.iloc[0,0])
 
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
+        st.dataframe(df)
 
-        # Centrar columnas de precio y variación usando Styler
-        df.index = df.index + 1
-        tabla_html = (
-            df.style
-            .format({"Variación %": "{:.2f}"})  # limitar a 2 decimales
-            .set_properties(
-                subset=["Precio ($/kg)", "Variación %"],
-                **{"text-align": "center"}
-            )
-            .to_html(index=False, escape=False)
-        )
-
-        # Mostrar tabla centrada en pantalla
-        st.markdown(
-            f"""
-            <div style="display: flex; justify-content: center;">
-                <div style="max-width: 90%;">
-                    {tabla_html}
-            """,
-            unsafe_allow_html=True
-        )
-
-        # Botón para descargar CSV
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
 
@@ -141,29 +141,11 @@ if st.button("Tabla fija"):
     else:
         st.error("❌ No se pudieron cargar los datos de Bogotá.")
 
-    # Productos que han bajado de precio
-    top_precio = df_bajaron.head(3).reset_index()
-    if not top_precio.empty:
-        st.subheader("📉 Productos que más han bajado de precio")
-        for i, row in top_precio.iterrows():
-            st.markdown(
-                f"{i+1}. **{row['Producto']}**: {row['Variación %']:.2f}%, "
-                f"su precio es: {row['Precio ($/kg)']}"
-            )
-    else:
-        st.warning("No hay productos que hayan bajado de precio en este día.")
+    # Mostrar productos que bajaron de precio
+    mostrar_top_variacion(df_bajaron, tipo="bajada")
+    # Mostrar productos que subieron de precio
+    mostrar_top_variacion(df_bajaron, tipo="subida") 
         
-    # Productos que han subido de precio
-    top_subida = df_bajaron.tail(3)
-    if not top_subida.empty:
-        st.subheader("📈 Productos que más han subido de precio")
-        for i, row in top_subida[::-1].reset_index(drop=True).iterrows():  # Mostrar en orden descendente
-            st.markdown(
-                f"{i+1}. **{row['Producto']}**: +{row['Variación %']:.2f}%, "
-                f"precio: {row['Precio ($/kg)']}"
-            )
-    else:
-        st.info("No hay productos que hayan subido de precio en este día.")
 
 if st.button("Tabla interactiva"):
     df_1 = obtener_datos_sipsa()
@@ -182,26 +164,10 @@ if st.button("Tabla interactiva"):
     else:
         st.error("❌ No se pudieron cargar los datos de Bogotá.")
 
-    # Productos que han bajado de precio
-    top_precio = df_bajaron.head(3).reset_index()
-    if not top_precio.empty:
-      st.subheader("📉 Productos que más han bajado de precio")
-      for i,row in top_precio.iterrows():
-        st.markdown(f"{i+1} **{row['Producto']}**: {row['Variación %']}%, su precio es: {row['Precio ($/kg)']}")
-    else:
-      st.warning("No hay productos que hayan bajado de precio en este día.")
-        
-    # Productos que han subido de precio
-    top_subida = df_bajaron.tail(3)
-    if not top_subida.empty:
-        st.subheader("📈 Productos que más han subido de precio")
-        for i, row in top_subida[::-1].reset_index(drop=True).iterrows():  # Mostrar en orden descendente
-            st.markdown(
-                f"{i+1}. **{row['Producto']}** +{row['Variación %']:.2f}% de variación, "
-                f"precio: {row['Precio ($/kg)']:}"
-            )
-    else:
-        st.info("No hay productos que hayan subido de precio en este día.")   
+    # Mostrar productos que bajaron de precio
+    mostrar_top_variacion(df_bajaron, tipo="bajada")
+    # Mostrar productos que subieron de precio
+    mostrar_top_variacion(df_bajaron, tipo="subida")   
     # P
 
 
