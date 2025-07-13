@@ -93,6 +93,7 @@ def procesar_bogota(df):
 
   # Opcional: eliminar filas vacías o sin precio
   df_bogota = df_bogota[df_bogota['Precio ($/kg)'].notna()].reset_index(drop=True).astype({'Precio ($/kg)': 'int64'})
+  df_bogota["Precio ($/kg)"] = df_bogota["Precio ($/kg)"].apply(lambda x: f"${x:,.0f}".replace(",", "."))
   df_productos_bajaron = df_bogota.sort_values(by='Variación %').reset_index(drop=True)
   return df_bogota, df_productos_bajaron
 
