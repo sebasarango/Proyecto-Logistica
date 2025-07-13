@@ -122,7 +122,7 @@ if st.button("🔄 Obtener precios"):
     if not top_precio.empty:
       st.subheader("Los productos que han bajado de precio en este día son:")
       for i,row in top_precio.iterrows():
-        st.markdown(f"{i} **{row['Producto']}**: {row['Variación %']}%, su precio es: {row['Precio ($/kg)']}")
+        st.markdown(f"{i+1} **{row['Producto']}**: {row['Variación %']}%, su precio es: {row['Precio ($/kg)']}")
     else:
       st.warning("No hay productos que hayan bajado de precio en este día.")
 
