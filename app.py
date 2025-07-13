@@ -164,43 +164,43 @@ if st.button("Tabla fija"):
     else:
         st.info("No hay productos que hayan subido de precio en este día.")
 
-    if st.button("Tabla interactiva"):
-        df_1 = obtener_datos_sipsa()
-        df, df_bajaron = procesar_bogota(df_1)
-        fecha = str(df_1.iloc[0,0])
+if st.button("Tabla interactiva"):
+    df_1 = obtener_datos_sipsa()
+    df, df_bajaron = procesar_bogota(df_1)
+    fecha = str(df_1.iloc[0,0])
 
-        if df is not None and "Error" not in df.columns:
-            st.subheader("📋 Tabla de precios (Bogotá)")
-            st.dataframe(df)
-    
-            csv = df.to_csv(index=False).encode('utf-8')
-            st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
-    
-            st.subheader("📝 Extracto del PDF de Bogotá")
-            st.markdown(f"📅 **La fecha de estos datos es:** {fecha}")
-        else:
-            st.error("❌ No se pudieron cargar los datos de Bogotá.")
-    
-        # Productos que han bajado de precio
-        top_precio = df_bajaron.head(3).reset_index()
-        if not top_precio.empty:
-          st.subheader("📉 Productos que más han bajado de precio")
-          for i,row in top_precio.iterrows():
-            st.markdown(f"{i+1} **{row['Producto']}**: {row['Variación %']}%, su precio es: {row['Precio ($/kg)']}")
-        else:
-          st.warning("No hay productos que hayan bajado de precio en este día.")
-            
-        # Productos que han subido de precio
-        top_subida = df_bajaron.tail(3)
-        if not top_subida.empty:
-            st.subheader("📈 Productos que más han subido de precio")
-            for i, row in top_subida[::-1].reset_index(drop=True).iterrows():  # Mostrar en orden descendente
-                st.markdown(
-                    f"{i+1}. **{row['Producto']}** +{row['Variación %']:.2f}% de variación, "
-                    f"precio: {row['Precio ($/kg)']:}"
-                )
-        else:
-            st.info("No hay productos que hayan subido de precio en este día.")   
+    if df is not None and "Error" not in df.columns:
+        st.subheader("📋 Tabla de precios (Bogotá)")
+        st.dataframe(df)
+
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
+
+        st.subheader("📝 Extracto del PDF de Bogotá")
+        st.markdown(f"📅 **La fecha de estos datos es:** {fecha}")
+    else:
+        st.error("❌ No se pudieron cargar los datos de Bogotá.")
+
+    # Productos que han bajado de precio
+    top_precio = df_bajaron.head(3).reset_index()
+    if not top_precio.empty:
+      st.subheader("📉 Productos que más han bajado de precio")
+      for i,row in top_precio.iterrows():
+        st.markdown(f"{i+1} **{row['Producto']}**: {row['Variación %']}%, su precio es: {row['Precio ($/kg)']}")
+    else:
+      st.warning("No hay productos que hayan bajado de precio en este día.")
+        
+    # Productos que han subido de precio
+    top_subida = df_bajaron.tail(3)
+    if not top_subida.empty:
+        st.subheader("📈 Productos que más han subido de precio")
+        for i, row in top_subida[::-1].reset_index(drop=True).iterrows():  # Mostrar en orden descendente
+            st.markdown(
+                f"{i+1}. **{row['Producto']}** +{row['Variación %']:.2f}% de variación, "
+                f"precio: {row['Precio ($/kg)']:}"
+            )
+    else:
+        st.info("No hay productos que hayan subido de precio en este día.")   
     # P
 
 
