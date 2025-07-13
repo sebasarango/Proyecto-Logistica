@@ -110,12 +110,18 @@ if st.button("🔄 Obtener precios"):
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
 
-        # Centrar la tabla sin modificar formato de columnas
-        tabla_html = df.to_html(index=False, escape=False)
+        # Centrar la columna 'Producto' usando Styler
+        tabla_html = (
+            df.style
+            .set_properties(subset=["Producto"], **{"text-align": "center"})
+            .to_html(index=False, escape=False)
+        )
+
+        # Mostrar la tabla centrada en pantalla
         st.markdown(
             f"""
             <div style="display: flex; justify-content: center;">
-                <div style="text-align: center; max-width: 90%;">
+                <div style="max-width: 90%;">
                     {tabla_html}
                 </div>
             </div>
@@ -123,7 +129,7 @@ if st.button("🔄 Obtener precios"):
             unsafe_allow_html=True
         )
 
-        # Descargar CSV (sin formateo)
+        # Botón para descargar CSV
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
 
@@ -144,16 +150,7 @@ if st.button("🔄 Obtener precios"):
     else:
         st.warning("No hay productos que hayan bajado de precio en este día.")
         
-    # Productos que han subido de precio
-    top_subida = df_bajaron.tail(3)
-    if not top_subida.empty:
-        st.subheader("📈 Productos que más han subido de precio")
-        for i, row in top_subida[::-1].reset_index(drop=True).iterrows():  # Mostrar en orden descendente
-            st.markdown(
-                f"{i+1}. **{row['Producto']}**: +{row['Variación %']:.2f}%, "
-                f"precio: {row['Precio ($/kg)']}"
-            )
-    else:
-        st.info("No hay productos que hayan subido de precio en este día.")
+    # P
+
 
 
