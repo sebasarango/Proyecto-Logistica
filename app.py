@@ -135,7 +135,7 @@ if st.button("🔄 Obtener precios"):
         for i, row in top_subida[::-1].reset_index(drop=True).iterrows():  # Mostrar en orden descendente
             st.markdown(
                 f"{i+1}. **{row['Producto']}** +{row['Variación %']:.2f}% de variación, "
-                f"precio: ${row['Precio ($/kg)']:}"
+                f"precio: {row['Precio ($/kg)']:}"
             )
     else:
         st.info("No hay productos que hayan subido de precio en este día.")    
