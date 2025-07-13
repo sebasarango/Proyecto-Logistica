@@ -126,8 +126,6 @@ if st.button("🔄 Obtener precios"):
             <div style="display: flex; justify-content: center;">
                 <div style="max-width: 90%;">
                     {tabla_html}
-                </div>
-            </div>
             """,
             unsafe_allow_html=True
         )
