@@ -156,7 +156,7 @@ if st.button("Tabla fija"):
         # Botón para descargar CSV
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
-        st.markdown(f"📅 **La fecha de estos datos es:** {fecha}")
+        st.markdown(f"📅 **Estos datos fueron actualizados por última vez el día:** {fecha}")
     else:
         st.error("❌ No se pudieron cargar los datos de Bogotá.")
         
@@ -169,10 +169,9 @@ if st.button("Tabla interactiva"):
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
         st.dataframe(df)
-
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
-        st.markdown(f"📅 **La fecha de estos datos es:** {fecha}")
+        st.markdown(f"📅 **Estos datos fueron actualizados por última vez el día:** {fecha}")
     else:
         st.error("❌ No se pudieron cargar los datos de Bogotá.")
 
