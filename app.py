@@ -124,7 +124,7 @@ st.set_page_config(page_title="Precios SIPSA - Bogotá", layout="centered")
 st.title("📊 Precios Mayoristas - Bogotá")
 st.caption("Consulta los precios publicados por el DANE desde el archivo 'Anexo'")
 
-if st.button("🔄 Obtener precios"):
+if st.button("Tabla fija"):
     df_1 = obtener_datos_sipsa()
     df, df_bajaron = procesar_bogota(df_1)
     fecha = str(df_1.iloc[0,0])
