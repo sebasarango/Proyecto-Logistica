@@ -113,6 +113,7 @@ if st.button("🔄 Obtener precios"):
         # Centrar columnas de precio y variación usando Styler
         tabla_html = (
             df.style
+            .format({"Variación %": "{:.2f}"})  # limitar a 2 decimales
             .set_properties(
                 subset=["Precio ($/kg)", "Variación %"],
                 **{"text-align": "center"}
