@@ -151,8 +151,19 @@ if st.button("🔄 Obtener precios"):
                 f"su precio es: {row['Precio ($/kg)']}"
             )
     else:
-        st.warning("No hay productos que hayan bajado de pre
-
+        st.warning("No hay productos que hayan bajado de precio en este día.")
+        
+    # Productos que han subido de precio
+    top_subida = df_bajaron.tail(3)
+    if not top_subida.empty:
+        st.subheader("📈 Productos que más han subido de precio")
+        for i, row in top_subida[::-1].reset_index(drop=True).iterrows():  # Mostrar en orden descendente
+            st.markdown(
+                f"{i+1}. **{row['Producto']}**: +{row['Variación %']:.2f}%, "
+                f"precio: {row['Precio ($/kg)']}"
+            )
+    else:
+        st.info("No hay productos que hayan subido de precio en este día.")
         
     # P
 
