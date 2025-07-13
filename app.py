@@ -93,15 +93,16 @@ def procesar_bogota(df):
 
   # Opcional: eliminar filas vacías o sin precio
   df_bogota = df_bogota[df_bogota['Precio ($/kg)'].notna()].reset_index(drop=True).astype({'Precio ($/kg)': 'int64'})
-  return df_bogota
+  df_productos_bajaron = df_bogota.sort_values(by='Variación %').reset_index(drop=True)
+  return df_bogota, df_productos_bajaron
 
 # === INTERFAZ STREAMLIT ===
 st.set_page_config(page_title="Precios SIPSA - Bogotá", layout="centered")
-st.title("📊 Precios Mayoristas - Bogotá")
+st.title("📊 Precios Mayoristas - Bogotá (SIPSA)")
 st.caption("Consulta los precios publicados por el DANE desde el archivo 'Anexo'")
 
 if st.button("🔄 Obtener precios"):
-    df_1 = obtener_datos_sipsa()
+    df_1,df_bajaron = obtener_datos_sipsa()
     df = procesar_bogota(df_1)
     fecha = str(df_1.iloc[0,0])
 
@@ -116,5 +117,13 @@ if st.button("🔄 Obtener precios"):
         st.markdown(f"📅 **La fecha de estos datos es:** {fecha}")
     else:
         st.error("❌ No se pudieron cargar los datos de Bogotá.")
+    
+    top_precio = df_bajaron.head(3).reset_index()
+    if not top_precio.empty:
+      st.subheader("Los productos que han bajado de precio en este día son:")
+      for i,row in top_precio.iterrows():
+        st.markdown(f"- **{row['Producto']}**: {row['Variación %']}%, y su precio es: {row['Precio ($/kg)']}")
+    else:
+      st.warning("No hay productos que hayan bajado de precio en este día.")
 
 
