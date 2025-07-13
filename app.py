@@ -105,12 +105,25 @@ st.caption("Consulta los precios publicados por el DANE desde el archivo 'Anexo'
 if st.button("🔄 Obtener precios"):
     df_1 = obtener_datos_sipsa()
     df, df_bajaron = procesar_bogota(df_1)
-    fecha = str(df_1.iloc[0,0])
+    fecha = str(df_1.iloc[0, 0])
 
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
-        st.dataframe(df)
 
+        # Centrar la tabla sin modificar formato de columnas
+        tabla_html = df.to_html(index=False, escape=False)
+        st.markdown(
+            f"""
+            <div style="display: flex; justify-content: center;">
+                <div style="text-align: center; max-width: 90%;">
+                    {tabla_html}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # Descargar CSV (sin formateo)
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
 
@@ -122,11 +135,14 @@ if st.button("🔄 Obtener precios"):
     # Productos que han bajado de precio
     top_precio = df_bajaron.head(3).reset_index()
     if not top_precio.empty:
-      st.subheader("📉 Productos que más han bajado de precio")
-      for i,row in top_precio.iterrows():
-        st.markdown(f"{i+1} **{row['Producto']}**: {row['Variación %']}%, su precio es: {row['Precio ($/kg)']}")
+        st.subheader("📉 Productos que más han bajado de precio")
+        for i, row in top_precio.iterrows():
+            st.markdown(
+                f"{i+1}. **{row['Producto']}**: {row['Variación %']:.2f}%, "
+                f"su precio es: {row['Precio ($/kg)']}"
+            )
     else:
-      st.warning("No hay productos que hayan bajado de precio en este día.")
+        st.warning("No hay productos que hayan bajado de precio en este día.")
         
     # Productos que han subido de precio
     top_subida = df_bajaron.tail(3)
@@ -134,10 +150,10 @@ if st.button("🔄 Obtener precios"):
         st.subheader("📈 Productos que más han subido de precio")
         for i, row in top_subida[::-1].reset_index(drop=True).iterrows():  # Mostrar en orden descendente
             st.markdown(
-                f"{i+1}. **{row['Producto']}** +{row['Variación %']:.2f}% de variación, "
-                f"precio: {row['Precio ($/kg)']:}"
+                f"{i+1}. **{row['Producto']}**: +{row['Variación %']:.2f}%, "
+                f"precio: {row['Precio ($/kg)']}"
             )
     else:
-        st.info("No hay productos que hayan subido de precio en este día.")    
+        st.info("No hay productos que hayan subido de precio en este día.")
 
 
