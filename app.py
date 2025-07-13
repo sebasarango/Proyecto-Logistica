@@ -123,12 +123,10 @@ def mostrar_top_variacion(df_bajaron, tipo="bajada"):
 st.set_page_config(page_title="Precios SIPSA - Bogotá", layout="centered")
 st.title("📊 Precios Mayoristas - Bogotá")
 st.caption("Consulta los precios publicados por el DANE desde el archivo 'Anexo'")
-
+df_1 = obtener_datos_sipsa()
+df, df_bajaron = procesar_bogota(df_1)
+fecha = str(df_1.iloc[0,0])
 if st.button("Tabla fija"):
-    df_1 = obtener_datos_sipsa()
-    df, df_bajaron = procesar_bogota(df_1)
-    fecha = str(df_1.iloc[0,0])
-
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
         st.dataframe(df)
@@ -148,10 +146,6 @@ if st.button("Tabla fija"):
         
 
 if st.button("Tabla interactiva"):
-    df_1 = obtener_datos_sipsa()
-    df, df_bajaron = procesar_bogota(df_1)
-    fecha = str(df_1.iloc[0,0])
-
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
         st.dataframe(df)
