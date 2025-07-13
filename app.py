@@ -109,7 +109,7 @@ if st.button("🔄 Obtener precios"):
 
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
-
+        df.index = df.index + 1
         # Centrar columnas de precio y variación usando Styler
         tabla_html = (
             df.style
