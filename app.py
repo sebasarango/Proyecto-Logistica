@@ -162,6 +162,11 @@ if st.button("Tabla fija"):
     else:
         st.error("❌ No se pudieron cargar los datos de Bogotá.")
         
+    # Mostrar productos que bajaron de precio
+    mostrar_top_variacion(df_bajaron, tipo="bajada")
+    # Mostrar productos que subieron de precio
+    mostrar_top_variacion(df_bajaron, tipo="subida")
+                          
 if st.button("Tabla interactiva"):
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
