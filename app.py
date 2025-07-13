@@ -110,14 +110,17 @@ if st.button("🔄 Obtener precios"):
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
 
-        # Centrar la columna 'Producto' usando Styler
+        # Centrar columnas de precio y variación usando Styler
         tabla_html = (
             df.style
-            .set_properties(subset=["Producto"], **{"text-align": "center"})
+            .set_properties(
+                subset=["Precio ($/kg)", "Variación %"],
+                **{"text-align": "center"}
+            )
             .to_html(index=False, escape=False)
         )
 
-        # Mostrar la tabla centrada en pantalla
+        # Mostrar tabla centrada en pantalla
         st.markdown(
             f"""
             <div style="display: flex; justify-content: center;">
@@ -148,7 +151,8 @@ if st.button("🔄 Obtener precios"):
                 f"su precio es: {row['Precio ($/kg)']}"
             )
     else:
-        st.warning("No hay productos que hayan bajado de precio en este día.")
+        st.warning("No hay productos que hayan bajado de pre
+
         
     # P
 
