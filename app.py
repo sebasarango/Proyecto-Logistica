@@ -110,39 +110,29 @@ if st.button("Tabla fija"):
     if df is not None and "Error" not in df.columns:
         st.subheader("📋 Tabla de precios (Bogotá)")
 
-        # Preparar tabla: index desde 1
+        # Centrar columnas de precio y variación usando Styler
         df.index = df.index + 1
-        mitad = len(df) // 2
-        df_izq = df.iloc[:mitad]
-        df_der = df.iloc[mitad:]
-
-        # Función para estilo uniforme
-        def estilizar_tabla(subdf):
-            return (
-                subdf.style
-                .format({"Variación %": "{:.2f}"})
-                .set_properties(
-                    subset=["Precio ($/kg)", "Variación %"],
-                    **{"text-align": "center"}
-                )
-                .to_html(index=False, escape=False)
+        tabla_html = (
+            df.style
+            .format({"Variación %": "{:.2f}"})  # limitar a 2 decimales
+            .set_properties(
+                subset=["Precio ($/kg)", "Variación %"],
+                **{"text-align": "center"}
             )
+            .to_html(index=False, escape=False)
+        )
 
-        html_izq = estilizar_tabla(df_izq)
-        html_der = estilizar_tabla(df_der)
-
-        # Renderizar dos columnas HTML con flexbox
+        # Mostrar tabla centrada en pantalla
         st.markdown(
             f"""
-            <div style="display: flex; justify-content: center; gap: 40px;">
-                <div style="flex: 1;">{html_izq}</div>
-                <div style="flex: 1;">{html_der}</div>
-            </div>
+            <div style="display: flex; justify-content: center;">
+                <div style="max-width: 90%;">
+                    {tabla_html}
             """,
             unsafe_allow_html=True
         )
 
-        # Botón para descargar CSV completo
+        # Botón para descargar CSV
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Descargar CSV", data=csv, file_name="precios_bogota.csv", mime='text/csv')
 
@@ -167,7 +157,7 @@ if st.button("Tabla fija"):
     top_subida = df_bajaron.tail(3)
     if not top_subida.empty:
         st.subheader("📈 Productos que más han subido de precio")
-        for i, row in top_subida[::-1].reset_index(drop=True).iterrows():
+        for i, row in top_subida[::-1].reset_index(drop=True).iterrows():  # Mostrar en orden descendente
             st.markdown(
                 f"{i+1}. **{row['Producto']}**: +{row['Variación %']:.2f}%, "
                 f"precio: {row['Precio ($/kg)']}"
