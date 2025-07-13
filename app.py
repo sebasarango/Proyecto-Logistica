@@ -120,7 +120,7 @@ if st.button("🔄 Obtener precios"):
     
     top_precio = df_bajaron.head(3).reset_index()
     if not top_precio.empty:
-      st.subheader("Los productos que han bajado de precio en este día son:")
+      st.subheader("📉 Productos que más han bajado de precio")
       for i,row in top_precio.iterrows():
         st.markdown(f"{i+1} **{row['Producto']}**: {row['Variación %']}%, su precio es: {row['Precio ($/kg)']}")
     else:
